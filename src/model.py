@@ -20,6 +20,20 @@ def _run_cv(model, x_train, y_train):
     cv_score = cross_val_score(model, x_train, y_train, cv=kfold)
     return cv_score
 
+def _print_report(y_test, y_pred, cv_score):
+    '''
+    Helper function to print model performance.
+    '''
+    report = classification_report(y_test, y_pred, target_names=["0=Poor", "1=Good"])
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Average cross-validation score: {cv_score.mean():.2f}")
+    print(f"Accuracy score: {accuracy:.2f}")
+
+def _print_full_report(y_test, y_pred):
+    print("="*60)
+    report = classification_report(y_test, y_pred, target_names=["0=Poor", "1=Good"])
+    print(report)
+
 def run_logistic_regression(x_train, x_test, y_train, y_test):
     '''
     Trains and evaluates a logistic regression classifier.
@@ -27,9 +41,8 @@ def run_logistic_regression(x_train, x_test, y_train, y_test):
     model = LogisticRegression(max_iter=1000)
     cv_score = _run_cv(model, x_train, y_train)
     model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
-    accuracy = accuracy_score(y_test, predictions)
-    return model, accuracy, cv_score
+    y_pred = model.predict(x_test)
+    _print_report(y_test, y_pred, cv_score)
 
 def run_svm(x_train, x_test, y_train, y_test, kernel='linear', c=1, gamma=1, degree=2):
     '''
@@ -42,9 +55,8 @@ def run_svm(x_train, x_test, y_train, y_test, kernel='linear', c=1, gamma=1, deg
         model = SVC(kernel=kernel, C=c, gamma=gamma)
     cv_score = _run_cv(model, x_train, y_train)
     model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
-    accuracy = accuracy_score(y_test, predictions)
-    return model, accuracy, cv_score
+    y_pred = model.predict(x_test)
+    _print_report(y_test, y_pred, cv_score)
 
 def run_lda(x_train, x_test, y_train, y_test, n_components=1):
     '''
@@ -53,6 +65,5 @@ def run_lda(x_train, x_test, y_train, y_test, n_components=1):
     model = LinearDiscriminantAnalysis(n_components=n_components)
     cv_score = _run_cv(model, x_train, y_train)
     model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
-    accuracy = accuracy_score(y_test, predictions)
-    return model, accuracy, cv_score
+    y_pred = model.predict(x_test)
+    _print_report(y_test, y_pred, cv_score)

@@ -1,1 +1,1 @@
-# wine-quality-classification
+# Wine Quality Classification
