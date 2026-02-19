@@ -44,11 +44,11 @@ def run_svm(X_train, X_test, y_train, y_test, kernel='linear', c=1, gamma=1, deg
     return model
 
 
-def run_lda(X_train, X_test, y_train, y_test, n_components=1):
+def run_lda(X_train, X_test, y_train, y_test):
     '''
     Trains and evaluates an LDA classifier.
     '''
-    model = LinearDiscriminantAnalysis(n_components=n_components)
+    model = LinearDiscriminantAnalysis(n_components=1)
     cv_score = _run_cv(model, X_train, y_train)
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -69,7 +69,7 @@ def run_classification_tree(X_train, X_test, y_train, y_test):
 
 
 # -----The following functions are for hyperparameter tuning-----
-def tune_logistic_regression(X_train, y_train):
+def tune_logistic_regression(X_train, X_test, y_train, y_test):
     """
     Tune Logistic Regression using C and l1_ratio for regularization.
     - l1_ratio = 0 → L2 only
@@ -96,12 +96,13 @@ def tune_logistic_regression(X_train, y_train):
     )
     
     grid.fit(X_train, y_train)
-    
+    accuracy_score = grid.best_estimator_.score(X_test, y_test)
     print("Best parameters:", grid.best_params_)
+    print("Accuracy score:", accuracy_score)
     return grid.best_estimator_
 
 
-def tune_svm(X_train, y_train, kernel, c, gamma, degree=2, n_iter=30):
+def tune_svm(X_train, X_test, y_train, y_test, kernel, c, gamma, degree=2, n_iter=30):
     '''
     Tunes SVM using cost, gamma, and degree(if kernel is polynomial).
     '''
@@ -140,11 +141,13 @@ def tune_svm(X_train, y_train, kernel, c, gamma, degree=2, n_iter=30):
         )
 
     search.fit(X_train, y_train)
+    accuracy_score = search.best_estimator_.score(X_test, y_test)
     print(f"Best parameters for {kernel} kernel:", search.best_params_)
+    print("Accuracy score:", accuracy_score)
     return search.best_estimator_
 
 
-def tune_lda(X_train, y_train):
+def tune_lda(X_train, X_test, y_train, y_test):
     '''
     Tuning the LDA classifier.
     Solver: 'svd', 'lsqr', 'eigen'
@@ -163,11 +166,13 @@ def tune_lda(X_train, y_train):
     grid = GridSearchCV(pipeline, param_grid=params, cv=5, scoring='accuracy')
 
     grid.fit(X_train, y_train)
-    print(f"Best parameters: {grid.best_params_}")
+    accuracy_score = grid.best_estimator_.score(X_test, y_test)
+    print("Best parameters:", grid.best_params_)
+    print("Accuracy score:", accuracy_score)
     return grid.best_estimator_
 
 
-def tune_classification_tree(X_train, y_train):
+def tune_classification_tree(X_train, X_test, y_train, y_test):
     '''
     Tunes a classification tree using max_depth, min_samples_split, min_samples_leaf, and criterion.
     '''
@@ -192,8 +197,9 @@ def tune_classification_tree(X_train, y_train):
     )
 
     search.fit(X_train, y_train)
-    print(f"Best parameters: {search.best_params_}")
-    print(f"Best CV score: {search.best_score_:.2f}")
+    accuracy_score = search.best_estimator_.score(X_test, y_test)
+    print(f"Best parameters:", search.best_params_)
+    print("Accuracy score:", accuracy_score)
     return search.best_estimator_
 
 
