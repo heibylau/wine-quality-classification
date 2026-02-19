@@ -18,7 +18,6 @@ def plot_accuracy_chart(models, model_names, X_test, y_test):
     plt.figure(figsize=(8, 5))
     bars = plt.bar(model_names, accuracies, color=sns.color_palette("tab10", len(models)))
 
-    # Add numeric labels on top of bars
     for bar, acc in zip(bars, accuracies):
         plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01, f"{acc:.3f}", 
                  ha='center', va='bottom', fontsize=10)
@@ -107,7 +106,6 @@ def plot_roc_curves(models, model_names, X_test, y_test):
     plt.figure(figsize=(8, 6))
     
     for model, name in zip(models, model_names):
-        # Some models need decision_function, others predict_proba
         if hasattr(model, "decision_function"):
             y_score = model.decision_function(X_test)
         else:
